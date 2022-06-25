@@ -61,17 +61,18 @@ def buttons(buttonx, buttony, buttonw, buttonh, color, msg, size,level):
                 else:
                     ai_level = 3
 
+
 def main_menu():
     # draw welcome message
     font1 = pygame.font.SysFont("arial", 45)
-    welcoming = font1.render("Welcome!", True, BLACK, GREY)
+    welcoming = font1.render("Pick your level!", True, BLACK, GREY)
     wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
     win.blit(welcoming, wRect)
 
     # draw buttons
-    buttons(100, 150, 400, 100, RED, "Level : Easy", 60,1)
-    buttons(100, 300, 175, 100, RED, "Level : Normal", 30,2)
-    buttons(325, 300, 175, 100, RED, "Level : Hard", 30,3)
+    buttons(WIDTH/3, 150, 175, 100, RED, "Level : Easy", 30,1)
+    buttons(WIDTH/3, 300, 175, 100, RED, "Level : Normal", 30,2)
+    buttons(WIDTH/3, 450, 175, 100, RED, "Level : Hard", 30,3)
     # left, top, width, height, color, message
 
 
@@ -86,30 +87,20 @@ pygame.init()
 #Game Start
 boards = Board(6, 7)
 
-#Screen
-Square_Size = 100
-
-width = boards.column * Square_Size
-height = (boards.row + 1) * Square_Size
-
-size = (width, height)
-
-Radius = int(Square_Size / 2 - 5)
-screen = pygame.display.set_mode(size)
-
 #Level status
 game_status = True
 player_status = False
 level_check = True
+game_over = False
 current_screen = "main menu"
 
-#Game status
-# game_status = False
+#Display Menu
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill(GREY)
 
 pygame.display.set_caption("Connect Four")
-Beta = pygame.image.load("Kucing.png")
+icon = pygame.image.load("logo.png")
+pygame.display.set_icon(icon)
 
 #Player and AI
 # turn = random.randint(PLAYER, AI)
@@ -129,6 +120,10 @@ while level_check:
         main_menu()
     elif current_screen == "blank":
         win.fill(GREY)
+        font1 = pygame.font.SysFont("arial", 45)
+        welcoming = font1.render("Press A to start!", True, BLACK, GREY)
+        wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
+        win.blit(welcoming, wRect)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -141,6 +136,16 @@ while level_check:
     pygame.display.update()
 
 if not game_status:
+    # Screen
+    Square_Size = 100
+
+    width = boards.column * Square_Size
+    height = (boards.row + 1) * Square_Size
+
+    size = (width, height)
+
+    Radius = int(Square_Size / 2 - 5)
+    screen = pygame.display.set_mode(size)
     temp = boards.create_board()
     draw_board(temp)
     pygame.display.update()
@@ -179,17 +184,16 @@ if not game_status:
                             screen.blit(label, (40, 10))
                             player_status = True
 
-                        turn += 1
-                        turn = turn % 2
-
                         boards.print_board(temp)
                         draw_board(temp)
 
-            if turn == boards.AI and not game_status:
+                        turn += 1
+                        turn = turn % 2
+
+            if turn == boards.AI and not game_status and player_status is False:
 
                 # col = random.randint(0, COLUMN_COUNT-1)
                 # col = pick_best_move(board, AI_PIECE)
-                print(ai_level)
                 if ai_level == 1:
                     col = boards.pick_best_move(temp, boards.AI_Piece)
                 elif ai_level == 2:
@@ -217,10 +221,22 @@ if not game_status:
 
             if player_status:
                 # screen.blit(Beta,(10,10))
-                screen.fill(Blue)
-                pygame.display.flip()
-                pygame.time.wait(3000)
                 game_status = True
+                game_over = True
 
+if game_over:
+    while game_over:
+        win.fill(GREY)
+        font1 = pygame.font.SysFont("arial", 45)
+        welcoming = font1.render("Game Over!", True, BLACK, GREY)
+        wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
+        win.blit(welcoming, wRect)
 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    game_over = False
 
+        pygame.display.update()
