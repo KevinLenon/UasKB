@@ -4,20 +4,12 @@ import math
 from pygame import mixer
 from Board import Board
 
-WIDTH = 600
-HEIGHT = 700
-
-RED = (255, 0, 0)
-BLACK = (0, 0, 0)
-GREY = (211, 211, 211)
-GREEN = (0, 255, 0)
-
 
 def draw_board(board):
     for c in range(boards.column):
         for r in range(boards.row):
             pygame.draw.rect(screen, Blue, (c * Square_Size, r * Square_Size + Square_Size, Square_Size, Square_Size))
-            pygame.draw.circle(screen, Black, (
+            pygame.draw.circle(screen, Background_color, (
                 int(c * Square_Size + Square_Size / 2), int(r * Square_Size + Square_Size + Square_Size / 2)), Radius)
 
     for c in range(boards.column):
@@ -30,26 +22,27 @@ def draw_board(board):
                     int(c * Square_Size + Square_Size / 2), height - int(r * Square_Size + Square_Size / 2)), Radius)
     pygame.display.update()
 
-def buttons(buttonx, buttony, buttonw, buttonh, color, msg, size,level):
-    global win, current_screen,ai_level
+
+def buttons(buttonx, buttony, buttonw, buttonh, color, msg, size, level):
+    global win, current_screen, ai_level
 
     pos = pygame.mouse.get_pos()
     fontb = pygame.font.SysFont("arial", size)
-    text = fontb.render(msg, True, BLACK)
+    text = fontb.render(msg, True, Black)
 
     # draw button outline and fill
     outline = pygame.Rect(buttonx - 2, buttony - 2, buttonw + 4, buttonh + 4)
-    win.fill(BLACK, outline)
+    win.fill(Black, outline)
     button = pygame.Rect(buttonx, buttony, buttonw, buttonh)
     win.fill(color, button)
 
     # draw button text
     textplace = text.get_rect(
-        center=(buttonx + buttonw/2, buttony + buttonh/2))
+        center=(buttonx + buttonw / 2, buttony + buttonh / 2))
     win.blit(text, textplace)
 
     if button.collidepoint(pos):  # button mouse-hover
-        win.fill(GREEN, button)
+        win.fill(Green, button)
         win.blit(text, textplace)
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:  # button pressed
@@ -65,53 +58,68 @@ def buttons(buttonx, buttony, buttonw, buttonh, color, msg, size,level):
 def main_menu():
     # draw welcome message
     font1 = pygame.font.SysFont("arial", 45)
-    welcoming = font1.render("Pick your level!", True, BLACK, GREY)
+    welcoming = font1.render("Pick your level!", True, Black, Grey)
     wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
     win.blit(welcoming, wRect)
 
     # draw buttons
-    buttons(WIDTH/3, 150, 175, 100, RED, "Level : Easy", 30,1)
-    buttons(WIDTH/3, 300, 175, 100, RED, "Level : Normal", 30,2)
-    buttons(WIDTH/3, 450, 175, 100, RED, "Level : Hard", 30,3)
+    buttons(WIDTH / 3, 150, 175, 100, Red, "Level : Easy", 30, 1)
+    buttons(WIDTH / 3, 300, 175, 100, Red, "Level : Normal", 30, 2)
+    buttons(WIDTH / 3, 450, 175, 100, Red, "Level : Hard", 30, 3)
     # left, top, width, height, color, message
 
 
+# Colors
 Blue = (0, 0, 255)
-Black = (63, 35, 47)
+Background_color = (37.5, 55, 25)
 Red = (255, 0, 0)
 Yellow = (255, 255, 0)
+Black = (0, 0, 0)
+Grey = (211, 211, 211)
+Green = (0, 255, 0)
 
-#Initialize Pygame
+WIDTH = 600
+HEIGHT = 700
+
+# Initialize Pygame
 pygame.init()
 
-#Game Start
+# Game Start
 boards = Board(6, 7)
 
-#Level status
+# Level status
 game_status = True
 player_status = False
 level_check = True
 game_over = False
 current_screen = "main menu"
 
-#Display Menu
+# Display Menu
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-win.fill(GREY)
+win.fill(Grey)
 
+# Window Caption
 pygame.display.set_caption("Connect Four")
+
+# Logo
 icon = pygame.image.load("logo.png")
 pygame.display.set_icon(icon)
 
-#Player and AI
+# Banner
+banner = pygame.image.load("banner.png")
+banner = pygame.transform.scale(banner, (450, 250))
+
+# Player and AI
 # turn = random.randint(PLAYER, AI)
 turn = 0
 ai_level = 0
+winner = " "
 
-#Text Font
+# Text Font
 myfont = pygame.font.SysFont("monospace", 75)
 
 # Backgroung sound
-mixer.music.load("Driftveil City.wav")
+mixer.music.load("PekoBMG.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(0.15)
 
@@ -119,9 +127,10 @@ while level_check:
     if current_screen == "main menu":
         main_menu()
     elif current_screen == "blank":
-        win.fill(GREY)
+        win.fill(Grey)
+        win.blit(banner, (100, 150))
         font1 = pygame.font.SysFont("arial", 45)
-        welcoming = font1.render("Press A to start!", True, BLACK, GREY)
+        welcoming = font1.render("Press A to start!", True, Black, Grey)
         wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
         win.blit(welcoming, wRect)
 
@@ -145,10 +154,12 @@ if not game_status:
     size = (width, height)
 
     Radius = int(Square_Size / 2 - 5)
+
     screen = pygame.display.set_mode(size)
     temp = boards.create_board()
     draw_board(temp)
     pygame.display.update()
+
     while not game_status:
 
         for event in pygame.event.get():
@@ -158,7 +169,7 @@ if not game_status:
 
             # Draw the circle at the top
             if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, Black, (0, 0, width, Square_Size))
+                pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
                 posx = event.pos[0]
                 if turn == boards.Player:
                     pygame.draw.circle(screen, Red, (posx, int(Square_Size / 2)), Radius)
@@ -166,7 +177,7 @@ if not game_status:
             pygame.display.update()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, Black, (0, 0, width, Square_Size))
+                pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
                 # print(event.pos)
                 # Ask for Player 1 Input
                 if turn == boards.Player:
@@ -180,8 +191,7 @@ if not game_status:
                         touch.play()
 
                         if boards.win_condition(temp, boards.Player_Piece):
-                            label = myfont.render("Player 1 wins!!", True, Red)
-                            screen.blit(label, (40, 10))
+                            winner = "Player 1 wins!!"
                             player_status = True
 
                         boards.print_board(temp)
@@ -209,8 +219,7 @@ if not game_status:
                     touch.play()
 
                     if boards.win_condition(temp, boards.AI_Piece):
-                        label = myfont.render("Player 2 wins!!", True, Yellow)
-                        screen.blit(label, (40, 10))
+                        winner = "Player 2 wins!!"
                         player_status = True
 
                     boards.print_board(temp)
@@ -226,17 +235,20 @@ if not game_status:
 
 if game_over:
     while game_over:
-        win.fill(GREY)
-        font1 = pygame.font.SysFont("arial", 45)
-        welcoming = font1.render("Game Over!", True, BLACK, GREY)
+        win.fill(Grey)
+        font1 = pygame.font.SysFont("arial", 30)
+        welcoming = font1.render("Game Over! Please Press ESC to quit ", True, Black, Grey)
         wRect = welcoming.get_rect(center=(WIDTH / 2, 75))
         win.blit(welcoming, wRect)
+
+        label = myfont.render(winner, True, Yellow)
+        win.blit(label, (30, 150))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_ESCAPE:
                     game_over = False
 
         pygame.display.update()
