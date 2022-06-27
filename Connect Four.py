@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+import random
 from pygame import mixer
 from Board import Board
 
@@ -37,7 +38,7 @@ def draw_board(board):
 
 
 def buttons(xpos, ypos, width, hight, color, msg, size, level):
-    global win, current_screen, ai_level
+    global win, current_screen, ai_level, game_status, player_status, level_check, game_over, game_start_again
 
     pos = pygame.mouse.get_pos()
     fontb = pygame.font.SysFont("javanesetext", size)
@@ -66,6 +67,10 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
                     ai_level = 2
                 else:
                     ai_level = 3
+
+                if level == 4:
+                    game_over = False
+                    game_start_again = True
 
 
 def main_menu():
@@ -110,7 +115,15 @@ game_status = True
 player_status = False
 level_check = True
 game_over = False
+game_start_again = False
 current_screen = "main menu"
+
+# Player and AI
+turn = random.randint(boards.Player, boards.AI)
+# turn = 0
+count = 0
+ai_level = 0
+winner = " "
 
 # Display Menu
 win = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -122,7 +135,7 @@ background_menu = pygame.image.load("menu.png")
 # Board texture
 beta = pygame.image.load("kucing.png")
 
-#Game Over texture
+# Game Over texture
 background_game_over = pygame.image.load("Game_Over.png")
 
 # Window Caption
@@ -136,92 +149,118 @@ pygame.display.set_icon(icon)
 banner = pygame.image.load("banner.png")
 banner = pygame.transform.scale(banner, (450, 250))
 
-# Player and AI
-# turn = random.randint(PLAYER, AI)
-turn = 0
-count = 0
-ai_level = 0
-winner = " "
-
-# Backgroung sound
+# Background sound
 mixer.music.load("PekoBMG.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(0.25)
 
-while level_check:
-    if current_screen == "main menu":
-        main_menu()
-    elif current_screen == "loading":
-        font1 = pygame.font.SysFont("javanesetext", 45)
-        header1 = font1.render("Press A to start!", True, Black)
-        window_rect1 = header1.get_rect(center=(WIDTH / 2, 75))
-        win.blit(background_menu,(0,0))
-        win.blit(banner, (125, 150))
-        win.blit(header1, window_rect1)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            level_check = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
-                play_BGM(1)
-                level_check = False
-                game_status = False
-
-    pygame.display.update()
-
-# Game screen
-if not game_status:
-    # Screen
-    Board_Size = 100
-
-    width = boards.column * Board_Size
-    height = (boards.row + 1) * Board_Size
-
-    size = (width, height)
-
-    Radius = int(Board_Size / 2 - 10)
-
-    screen = pygame.display.set_mode(size)
-    temp = boards.create_board()
-    draw_board(temp)
-    pygame.display.update()
-
-    while not game_status:
-
+while True:
+    while level_check:
+        if current_screen == "main menu":
+            main_menu()
+        elif current_screen == "loading":
+            font1 = pygame.font.SysFont("javanesetext", 45)
+            header1 = font1.render("Press A to start!", True, Black)
+            window_rect1 = header1.get_rect(center=(WIDTH / 2, 75))
+            win.blit(background_menu, (0, 0))
+            win.blit(banner, (125, 150))
+            win.blit(header1, window_rect1)
         for event in pygame.event.get():
-            # Exit the game
             if event.type == pygame.QUIT:
-                sys.exit()
-            pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
+                level_check = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    play_BGM(1)
+                    level_check = False
+                    game_status = False
 
-            # Draw circle at the top and move it with mouse
-            if event.type == pygame.MOUSEMOTION:
+        pygame.display.update()
+
+    # Game screen
+    if not game_status:
+        # Screen
+        Board_Size = 100
+
+        width = boards.column * Board_Size
+        height = (boards.row + 1) * Board_Size
+
+        size = (width, height)
+
+        Radius = int(Board_Size / 2 - 10)
+
+        screen = pygame.display.set_mode(size)
+        temp = boards.create_board()
+        draw_board(temp)
+        pygame.display.update()
+
+        while not game_status:
+
+            for event in pygame.event.get():
+                # Exit the game
+                if event.type == pygame.QUIT:
+                    sys.exit()
                 pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
-                posx = event.pos[0]
-                if turn == boards.Player:
-                    pygame.draw.circle(screen, Red, (posx, int(Board_Size / 2)), Radius)
 
-            pygame.display.update()
-
-            # Checking event condition
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
-                # Player turn to drop the pieces
-
-                if turn == boards.Player:
+                # Draw circle at the top and move it with mouse
+                if event.type == pygame.MOUSEMOTION:
+                    pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
                     posx = event.pos[0]
-                    col = int(math.floor(posx / Board_Size))
+                    if turn == boards.Player:
+                        pygame.draw.circle(screen, Red, (posx, int(Board_Size / 2)), Radius)
 
-                    # Checking player position is valid or no
+                pygame.display.update()
+
+                # Checking event condition
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
+                    # Player turn to drop the pieces
+
+                    if turn == boards.Player:
+                        posx = event.pos[0]
+                        col = int(math.floor(posx / Board_Size))
+
+                        # Checking player position is valid or no
+                        if boards.check_valid_position(temp, col):
+                            row = boards.get_free_row(temp, col)
+                            boards.drop_piece(temp, row, col, boards.Player_Piece)
+                            play_BGM(2)
+
+                            # Checking player is win or not
+                            if boards.win_condition(temp, boards.Player_Piece):
+                                play_BGM(3)
+                                winner = "Player 1 wins!!"
+                                player_status = True
+
+                            # boards.print_board(temp)
+                            draw_board(temp)
+
+                            turn += 1
+                            count += 1
+                            turn = turn % 2
+
+                            # Draw situation
+                            if count == 42:
+                                winner = "Draw"
+                                player_status = True
+
+                # AI turn to drop pieces
+                if turn == boards.AI and not game_status and player_status is False:
+                    # level 1 = easy, 2 = normal, 3 = hard
+                    if ai_level == 1:
+                        col = boards.easy_ai(temp, boards.AI_Piece)
+                    elif ai_level == 2:
+                        col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, False)
+                    else:
+                        col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, True)
+
                     if boards.check_valid_position(temp, col):
                         row = boards.get_free_row(temp, col)
-                        boards.drop_piece(temp, row, col, boards.Player_Piece)
+                        boards.drop_piece(temp, row, col, boards.AI_Piece)
                         play_BGM(2)
 
-                        # Checking player is win or not
-                        if boards.win_condition(temp, boards.Player_Piece):
+                        if boards.win_condition(temp, boards.AI_Piece):
                             play_BGM(3)
-                            winner = "Player 1 wins!!"
+                            winner = "Player 2 wins!!"
                             player_status = True
 
                         # boards.print_board(temp)
@@ -231,67 +270,57 @@ if not game_status:
                         count += 1
                         turn = turn % 2
 
-                        # Draw situation
                         if count == 42:
                             winner = "Draw"
                             player_status = True
 
-            # AI turn to drop pieces
-            if turn == boards.AI and not game_status and player_status is False:
-                # level 1 = easy, 2 = normal, 3 = hard
-                if ai_level == 1:
-                    col = boards.easy_ai(temp, boards.AI_Piece)
-                elif ai_level == 2:
-                    col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, False)
-                else:
-                    col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, True)
+                # Game end Status
+                if player_status:
+                    # screen.blit(Beta,(10,10))
+                    # Waiting time
+                    pygame.time.wait(1250)
+                    game_status = True
+                    game_over = True
 
-                if boards.check_valid_position(temp, col):
-                    row = boards.get_free_row(temp, col)
-                    boards.drop_piece(temp, row, col, boards.AI_Piece)
-                    play_BGM(2)
+    # Game over screen
+    if game_over:
+        while game_over:
+            font1 = pygame.font.SysFont("javanesetext", 30)
+            end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black)
+            window_end_rect = end_Header.get_rect(center=(350, 300))
+            win.blit(background_game_over, (0, 0))
+            win.blit(end_Header, window_end_rect)
 
-                    if boards.win_condition(temp, boards.AI_Piece):
-                        play_BGM(3)
-                        winner = "Player 2 wins!!"
-                        player_status = True
+            label = font1.render(winner, True, Black)
+            win.blit(label, (250, 350))
 
-                    # boards.print_board(temp)
-                    draw_board(temp)
+            buttons(WIDTH / 3, 500, 200, 100, Red, "Level : Hard", 30, 4)
 
-                    turn += 1
-                    count += 1
-                    turn = turn % 2
-
-                    if count == 42:
-                        winner = "Draw"
-                        player_status = True
-
-            # Game end Status
-            if player_status:
-                # screen.blit(Beta,(10,10))
-                # Waiting time
-                pygame.time.wait(1250)
-                game_status = True
-                game_over = True
-
-# Game over screen
-if game_over:
-    while game_over:
-        font1 = pygame.font.SysFont("javanesetext", 30)
-        end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black)
-        window_end_rect = end_Header.get_rect(center=(350, 300))
-        win.blit(background_game_over,(0,0))
-        win.blit(end_Header, window_end_rect)
-
-        label = font1.render(winner, True, Black)
-        win.blit(label, (250, 350))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     game_over = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_over = False
 
-        pygame.display.update()
+            pygame.display.update()
+
+    if not game_over and game_start_again:
+        # ReDeclare
+
+        # Level status
+        game_status = True
+        player_status = False
+        level_check = True
+        game_over = False
+        game_start_again = False
+        current_screen = "main menu"
+
+        # Player and AI
+        turn = random.randint(boards.Player, boards.AI)
+        # turn = 0
+        count = 0
+        ai_level = 0
+        winner = " "
+    else:
+        break
