@@ -22,7 +22,7 @@ def draw_board(board):
         for j in range(boards.row):
             screen.blit(beta, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
             # pygame.draw.rect(screen, Blue, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
-            pygame.draw.circle(screen, Grey, (
+            pygame.draw.circle(screen, Background_color, (
                 int(i * Board_Size + Board_Size / 2), int(j * Board_Size + Board_Size + Board_Size / 2)), Radius)
 
     for i in range(boards.column):
@@ -70,21 +70,25 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
 
 def main_menu():
     # draw welcome message
-    font = pygame.font.SysFont("javanesetext", 45)
-    header = font.render("Pick your level!", True, Black, Grey)
+    font = pygame.font.SysFont("javanesetext", 38)
+    header2 = font.render("Pick your level!", True, Black)
+    header = font.render("Welcome To Connect Four", True, Black)
     window_rect = header.get_rect(center=(WIDTH / 2, 75))
+    win.blit(background_menu, (0, 0))
     win.blit(header, window_rect)
+    win.blit(header2, (200, 90))
 
     # draw buttons
-    buttons(WIDTH / 3, 150, 200, 100, Red, "Level : Easy", 30, 1)
-    buttons(WIDTH / 3, 300, 200, 100, Red, "Level : Normal", 30, 2)
-    buttons(WIDTH / 3, 450, 200, 100, Red, "Level : Hard", 30, 3)
+    buttons(WIDTH / 3, 200, 200, 100, Red, "Level : Easy", 30, 1)
+    buttons(WIDTH / 3, 350, 200, 100, Red, "Level : Normal", 30, 2)
+    buttons(WIDTH / 3, 500, 200, 100, Red, "Level : Hard", 30, 3)
+    pygame.display.update()
     # left, top, width, height, color, message
 
 
 # Colors
 Blue = (0, 0, 255)
-Background_color = (67, 125, 96)
+Background_color = (255, 178, 102)
 Red = (255, 0, 0)
 Yellow = (255, 255, 0)
 Black = (0, 0, 0)
@@ -97,6 +101,7 @@ HEIGHT = 700
 
 # Initialize Pygame
 pygame.init()
+
 # Game Start
 boards = Board(6, 7)
 
@@ -111,9 +116,14 @@ current_screen = "main menu"
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill(Grey)
 
-# Board textture
+# Mainmenu texture
+background_menu = pygame.image.load("menu.png")
+
+# Board texture
 beta = pygame.image.load("kucing.png")
-lingkaran = pygame.image.load("gundam.png")
+
+#Game Over texture
+background_game_over = pygame.image.load("Game_Over.png")
 
 # Window Caption
 pygame.display.set_caption("Connect Four")
@@ -133,25 +143,21 @@ count = 0
 ai_level = 0
 winner = " "
 
-# Text Font
-
 # Backgroung sound
 mixer.music.load("PekoBMG.wav")
 mixer.music.play(-1)
 mixer.music.set_volume(0.25)
 
-# Main menu screen
 while level_check:
     if current_screen == "main menu":
         main_menu()
     elif current_screen == "loading":
-        win.fill(Grey)
-        win.blit(banner, (80, 150))
         font1 = pygame.font.SysFont("javanesetext", 45)
-        header1 = font1.render("Press A to start!", True, Black, Grey)
+        header1 = font1.render("Press A to start!", True, Black)
         window_rect1 = header1.get_rect(center=(WIDTH / 2, 75))
+        win.blit(background_menu,(0,0))
+        win.blit(banner, (125, 150))
         win.blit(header1, window_rect1)
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             level_check = False
@@ -186,11 +192,11 @@ if not game_status:
             # Exit the game
             if event.type == pygame.QUIT:
                 sys.exit()
-            pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
+            pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
 
             # Draw circle at the top and move it with mouse
             if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
+                pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
                 posx = event.pos[0]
                 if turn == boards.Player:
                     pygame.draw.circle(screen, Red, (posx, int(Board_Size / 2)), Radius)
@@ -199,7 +205,7 @@ if not game_status:
 
             # Checking event condition
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
+                pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
                 # Player turn to drop the pieces
 
                 if turn == boards.Player:
@@ -272,14 +278,14 @@ if not game_status:
 # Game over screen
 if game_over:
     while game_over:
-        win.fill(Grey)
         font1 = pygame.font.SysFont("javanesetext", 30)
-        end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black, Grey)
-        window_end_rect = end_Header.get_rect(center=(350, 75))
+        end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black)
+        window_end_rect = end_Header.get_rect(center=(350, 300))
+        win.blit(background_game_over,(0,0))
         win.blit(end_Header, window_end_rect)
 
         label = font1.render(winner, True, Black)
-        win.blit(label, (30, 150))
+        win.blit(label, (250, 350))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
