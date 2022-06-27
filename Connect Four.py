@@ -5,6 +5,18 @@ from pygame import mixer
 from Board import Board
 
 
+def play_BGM(choice):
+    touch = mixer.Sound("touch.mp3")
+    if choice == 1:
+        touch = mixer.Sound("touch.mp3")
+    elif choice == 2:
+        touch = mixer.Sound("drop.wav")
+    elif choice == 3:
+        touch = mixer.Sound("win.wav")
+
+    touch.play()
+
+
 def draw_board(board):
     for i in range(boards.column):
         for j in range(boards.row):
@@ -46,6 +58,7 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
         win.blit(text, textplace)
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:  # button pressed
+                play_BGM(1)
                 current_screen = "loading"
                 if level == 1:
                     ai_level = 1
@@ -79,7 +92,7 @@ Grey = (211, 211, 211)
 Green = (0, 255, 0)
 
 # Menu Screen
-WIDTH = 600
+WIDTH = 700
 HEIGHT = 700
 
 # Initialize Pygame
@@ -144,6 +157,7 @@ while level_check:
             level_check = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
+                play_BGM(1)
                 level_check = False
                 game_status = False
 
@@ -196,13 +210,11 @@ if not game_status:
                     if boards.check_valid_position(temp, col):
                         row = boards.get_free_row(temp, col)
                         boards.drop_piece(temp, row, col, boards.Player_Piece)
-                        touch = mixer.Sound("drop.wav")
-                        touch.play()
+                        play_BGM(2)
 
                         # Checking player is win or not
                         if boards.win_condition(temp, boards.Player_Piece):
-                            touch = mixer.Sound("win.wav")
-                            touch.play()
+                            play_BGM(3)
                             winner = "Player 1 wins!!"
                             player_status = True
 
@@ -231,12 +243,10 @@ if not game_status:
                 if boards.check_valid_position(temp, col):
                     row = boards.get_free_row(temp, col)
                     boards.drop_piece(temp, row, col, boards.AI_Piece)
-                    touch = mixer.Sound("drop.wav")
-                    touch.play()
+                    play_BGM(2)
 
                     if boards.win_condition(temp, boards.AI_Piece):
-                        touch = mixer.Sound("win.wav")
-                        touch.play()
+                        play_BGM(3)
                         winner = "Player 2 wins!!"
                         player_status = True
 
