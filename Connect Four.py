@@ -8,18 +8,19 @@ from Board import Board
 def draw_board(board):
     for i in range(boards.column):
         for j in range(boards.row):
-            pygame.draw.rect(screen, Blue, (i * Square_Size, j * Square_Size + Square_Size, Square_Size, Square_Size))
+            screen.blit(beta, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
+            # pygame.draw.rect(screen, Blue, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
             pygame.draw.circle(screen, Background_color, (
-                int(i * Square_Size + Square_Size / 2), int(j * Square_Size + Square_Size + Square_Size / 2)), Radius)
+                int(i * Board_Size + Board_Size / 2), int(j * Board_Size + Board_Size + Board_Size / 2)), Radius)
 
     for i in range(boards.column):
         for j in range(boards.row):
             if board[j][i] == boards.Player_Piece:
                 pygame.draw.circle(screen, Red, (
-                    int(i * Square_Size + Square_Size / 2), height - int(j * Square_Size + Square_Size / 2)), Radius)
+                    int(i * Board_Size + Board_Size / 2), height - int(j * Board_Size + Board_Size / 2)), Radius)
             elif board[j][i] == boards.AI_Piece:
                 pygame.draw.circle(screen, Yellow, (
-                    int(i * Square_Size + Square_Size / 2), height - int(j * Square_Size + Square_Size / 2)), Radius)
+                    int(i * Board_Size + Board_Size / 2), height - int(j * Board_Size + Board_Size / 2)), Radius)
     pygame.display.update()
 
 
@@ -70,7 +71,7 @@ def main_menu():
 
 # Colors
 Blue = (0, 0, 255)
-Background_color = (37.5, 55, 25)
+Background_color = (67, 125, 96)
 Red = (255, 0, 0)
 Yellow = (255, 255, 0)
 Black = (0, 0, 0)
@@ -97,6 +98,10 @@ current_screen = "main menu"
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill(Grey)
 
+# Board textture
+beta = pygame.image.load("kucing.png")
+lingkaran = pygame.image.load("gundam.png")
+
 # Window Caption
 pygame.display.set_caption("Connect Four")
 
@@ -116,7 +121,6 @@ ai_level = 0
 winner = " "
 
 # Text Font
-myfont = pygame.font.SysFont("monospace", 75)
 
 # Backgroung sound
 mixer.music.load("PekoBMG.wav")
@@ -148,14 +152,14 @@ while level_check:
 # Game screen
 if not game_status:
     # Screen
-    Square_Size = 100
+    Board_Size = 100
 
-    width = boards.column * Square_Size
-    height = (boards.row + 1) * Square_Size
+    width = boards.column * Board_Size
+    height = (boards.row + 1) * Board_Size
 
     size = (width, height)
 
-    Radius = int(Square_Size / 2 - 5)
+    Radius = int(Board_Size / 2 - 10)
 
     screen = pygame.display.set_mode(size)
     temp = boards.create_board()
@@ -168,23 +172,24 @@ if not game_status:
             # Exit the game
             if event.type == pygame.QUIT:
                 sys.exit()
+            pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
 
             # Draw circle at the top and move it with mouse
-            if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
-                posx = event.pos[0]
-                if turn == boards.Player:
-                    pygame.draw.circle(screen, Red, (posx, int(Square_Size / 2)), Radius)
+            # if event.type == pygame.MOUSEMOTION:
+            #     pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
+            #     posx = event.pos[0]
+            #     if turn == boards.Player:
+            #         pygame.draw.circle(screen, Red, (posx, int(Square_Size / 2)), Radius)
 
             pygame.display.update()
 
             # Checking event condition
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
+                pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
                 # Player turn to drop the pieces
                 if turn == boards.Player:
                     posx = event.pos[0]
-                    col = int(math.floor(posx / Square_Size))
+                    col = int(math.floor(posx / Board_Size))
 
                     # Checking player position is valid or free
                     if boards.check_valid_position(temp, col):
@@ -214,11 +219,11 @@ if not game_status:
             if turn == boards.AI and not game_status and player_status is False:
                 # level 1 = easy, 2 = normal, 3 = hard
                 if ai_level == 1:
-                    col = boards.pick_best_move(temp, boards.AI_Piece)
+                    col = boards.easy_ai(temp, boards.AI_Piece)
                 elif ai_level == 2:
-                    col, minimax_score = boards.minimax(temp, 5, -math.inf, math.inf, False)
+                    col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, False)
                 else:
-                    col, minimax_score = boards.minimax(temp, 5, -math.inf, math.inf, True)
+                    col, minimax_score = boards.ai_minimax(temp, 5, -math.inf, math.inf, True)
 
                 if boards.check_valid_position(temp, col):
                     row = boards.get_free_row(temp, col)
@@ -249,16 +254,16 @@ if not game_status:
                 game_status = True
                 game_over = True
 
-# Game overscreen
+# Game over screen
 if game_over:
     while game_over:
         win.fill(Grey)
         font1 = pygame.font.SysFont("monospace", 30)
-        welcoming = font1.render("Game Over! Please Press ESC to quit ", True, Black, Grey)
-        wRect = welcoming.get_rect(center=(350, 75))
-        win.blit(welcoming, wRect)
+        end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black, Grey)
+        window_end_rect = end_Header.get_rect(center=(350, 75))
+        win.blit(end_Header, window_end_rect)
 
-        label = myfont.render(winner, True, Black)
+        label = font1.render(winner, True, Black)
         win.blit(label, (30, 150))
 
         for event in pygame.event.get():
