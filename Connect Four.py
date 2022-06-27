@@ -10,7 +10,7 @@ def draw_board(board):
         for j in range(boards.row):
             screen.blit(beta, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
             # pygame.draw.rect(screen, Blue, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
-            pygame.draw.circle(screen, Background_color, (
+            pygame.draw.circle(screen, Grey, (
                 int(i * Board_Size + Board_Size / 2), int(j * Board_Size + Board_Size + Board_Size / 2)), Radius)
 
     for i in range(boards.column):
@@ -28,7 +28,7 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
     global win, current_screen, ai_level
 
     pos = pygame.mouse.get_pos()
-    fontb = pygame.font.SysFont("arial", size)
+    fontb = pygame.font.SysFont("javanesetext", size)
     text = fontb.render(msg, True, Black)
 
     # draw button outline and fill
@@ -57,15 +57,15 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
 
 def main_menu():
     # draw welcome message
-    font = pygame.font.SysFont("monospace", 45)
+    font = pygame.font.SysFont("javanesetext", 45)
     header = font.render("Pick your level!", True, Black, Grey)
     window_rect = header.get_rect(center=(WIDTH / 2, 75))
     win.blit(header, window_rect)
 
     # draw buttons
-    buttons(WIDTH / 3, 150, 175, 100, Red, "Level : Easy", 30, 1)
-    buttons(WIDTH / 3, 300, 175, 100, Red, "Level : Normal", 30, 2)
-    buttons(WIDTH / 3, 450, 175, 100, Red, "Level : Hard", 30, 3)
+    buttons(WIDTH / 3, 150, 200, 100, Red, "Level : Easy", 30, 1)
+    buttons(WIDTH / 3, 300, 200, 100, Red, "Level : Normal", 30, 2)
+    buttons(WIDTH / 3, 450, 200, 100, Red, "Level : Hard", 30, 3)
     # left, top, width, height, color, message
 
 
@@ -134,7 +134,7 @@ while level_check:
     elif current_screen == "loading":
         win.fill(Grey)
         win.blit(banner, (80, 150))
-        font1 = pygame.font.SysFont("monospace", 45)
+        font1 = pygame.font.SysFont("javanesetext", 45)
         header1 = font1.render("Press A to start!", True, Black, Grey)
         window_rect1 = header1.get_rect(center=(WIDTH / 2, 75))
         win.blit(header1, window_rect1)
@@ -172,34 +172,37 @@ if not game_status:
             # Exit the game
             if event.type == pygame.QUIT:
                 sys.exit()
-            pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
+            pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
 
             # Draw circle at the top and move it with mouse
-            # if event.type == pygame.MOUSEMOTION:
-            #     pygame.draw.rect(screen, Background_color, (0, 0, width, Square_Size))
-            #     posx = event.pos[0]
-            #     if turn == boards.Player:
-            #         pygame.draw.circle(screen, Red, (posx, int(Square_Size / 2)), Radius)
+            if event.type == pygame.MOUSEMOTION:
+                pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
+                posx = event.pos[0]
+                if turn == boards.Player:
+                    pygame.draw.circle(screen, Red, (posx, int(Board_Size / 2)), Radius)
 
             pygame.display.update()
 
             # Checking event condition
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, Background_color, (0, 0, width, Board_Size))
+                pygame.draw.rect(screen, Grey, (0, 0, width, Board_Size))
                 # Player turn to drop the pieces
+
                 if turn == boards.Player:
                     posx = event.pos[0]
                     col = int(math.floor(posx / Board_Size))
 
-                    # Checking player position is valid or free
+                    # Checking player position is valid or no
                     if boards.check_valid_position(temp, col):
                         row = boards.get_free_row(temp, col)
                         boards.drop_piece(temp, row, col, boards.Player_Piece)
-                        touch = mixer.Sound("touch.mp3")
+                        touch = mixer.Sound("drop.wav")
                         touch.play()
 
                         # Checking player is win or not
                         if boards.win_condition(temp, boards.Player_Piece):
+                            touch = mixer.Sound("win.wav")
+                            touch.play()
                             winner = "Player 1 wins!!"
                             player_status = True
 
@@ -228,10 +231,12 @@ if not game_status:
                 if boards.check_valid_position(temp, col):
                     row = boards.get_free_row(temp, col)
                     boards.drop_piece(temp, row, col, boards.AI_Piece)
-                    touch = mixer.Sound("touch.mp3")
+                    touch = mixer.Sound("drop.wav")
                     touch.play()
 
                     if boards.win_condition(temp, boards.AI_Piece):
+                        touch = mixer.Sound("win.wav")
+                        touch.play()
                         winner = "Player 2 wins!!"
                         player_status = True
 
@@ -258,7 +263,7 @@ if not game_status:
 if game_over:
     while game_over:
         win.fill(Grey)
-        font1 = pygame.font.SysFont("monospace", 30)
+        font1 = pygame.font.SysFont("javanesetext", 30)
         end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black, Grey)
         window_end_rect = end_Header.get_rect(center=(350, 75))
         win.blit(end_Header, window_end_rect)
