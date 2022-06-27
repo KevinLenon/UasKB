@@ -1,7 +1,5 @@
 import numpy as np
 import random
-import pygame
-import sys
 import math
 
 
@@ -19,7 +17,6 @@ class Board:
         self.stat = 1
 
     def create_board(self):
-        # Membuat array kosong dengan panjanga row x column
         board = np.zeros((self.row, self.column))
         return board
 
@@ -27,11 +24,11 @@ class Board:
         self.stat = 0
         board[row][col] = piece
 
+    # Check the room is free or 0
     def check_valid_position(self, board, col):
         return board[self.row - 1][col] == 0
 
     def get_valid_locations(self, board):
-        self.stat = 1
         valid_locations = []
         for col in range(self.column):
             if self.check_valid_position(board, col):
@@ -39,7 +36,6 @@ class Board:
         return valid_locations
 
     def get_free_row(self, board, col):
-
         for i in range(self.row):
             if board[i][col] == 0:
                 return i
@@ -49,27 +45,28 @@ class Board:
         print(np.flip(board, 0))
 
     def win_condition(self, board, piece):
+        # Check horizontal board
         for i in range(self.column - 3):
             for j in range(self.row):
                 if board[j][i] == piece and board[j][i + 1] == piece and board[j][i + 2] == piece and board[j][
                     i + 3] == piece:
                     return True
 
-        # Check vertical locations for win
+        # Check vertical board
         for i in range(self.column):
             for j in range(self.row - 3):
                 if board[j][i] == piece and board[j + 1][i] == piece and board[j + 2][i] == piece and board[j + 3][
                     i] == piece:
                     return True
 
-        # Check positively sloped diaganols
+        # Check positively sloped board
         for i in range(self.column - 3):
             for j in range(self.row - 3):
                 if board[j][i] == piece and board[j + 1][i + 1] == piece and board[j + 2][i + 2] == piece and \
                         board[j + 3][i + 3] == piece:
                     return True
 
-        # Check negatively sloped diaganols
+        # Check negatively sloped board
         for i in range(self.column - 3):
             for j in range(3, self.row):
                 if board[j][i] == piece and board[j - 1][i + 1] == piece and board[j - 2][i + 2] == piece and \
@@ -97,31 +94,32 @@ class Board:
     def score_position(self, board, piece):
         score = 0
 
-        ## Score center column
+        # Score center column
         center_array = [int(i) for i in list(board[:, self.column // 2])]
         center_count = center_array.count(piece)
         score += center_count * 3
 
-        ## Score Horizontal
+        # Score Horizontal
         for r in range(self.row):
             row_array = [int(i) for i in list(board[r, :])]
             for c in range(self.column - 3):
                 window = row_array[c:c + self.Window_Length]
                 score += self.get_score(window, piece)
 
-        ## Score Vertical
+        # Score Vertical
         for c in range(self.column):
             col_array = [int(i) for i in list(board[:, c])]
             for r in range(self.row - 3):
                 window = col_array[r:r + self.Window_Length]
                 score += self.get_score(window, piece)
 
-        ## Score posiive sloped diagonal
+        # Score positive sloped diagonal
         for r in range(self.row - 3):
             for c in range(self.column - 3):
                 window = [board[r + i][c + i] for i in range(self.Window_Length)]
                 score += self.get_score(window, piece)
 
+        # Score negative sloped diagonal
         for r in range(self.row - 3):
             for c in range(self.column - 3):
                 window = [board[r + 3 - i][c + i] for i in range(self.Window_Length)]
@@ -133,7 +131,7 @@ class Board:
         return self.win_condition(board, self.Player_Piece) or self.win_condition(board, self.AI_Piece) or len(
             self.get_valid_locations(board)) == 0
 
-    def minimax(self,board, depth, alpha, beta, maximizingPlayer):
+    def ai_minimax(self, board, depth, alpha, beta, maximizingPlayer):
         valid_locations = self.get_valid_locations(board)
         is_terminal = self.is_terminal_node(board)
         if depth == 0 or is_terminal:
@@ -153,7 +151,7 @@ class Board:
                 row = self.get_free_row(board, col)
                 b_copy = board.copy()
                 self.drop_piece(b_copy, row, col, self.AI_Piece)
-                new_score = self.minimax(b_copy, depth - 1, alpha, beta, False)[1]
+                new_score = self.ai_minimax(b_copy, depth - 1, alpha, beta, False)[1]
                 if new_score > value:
                     value = new_score
                     column = col
@@ -169,7 +167,7 @@ class Board:
                 row = self.get_free_row(board, col)
                 b_copy = board.copy()
                 self.drop_piece(b_copy, row, col, self.Player_Piece)
-                new_score = self.minimax(b_copy, depth - 1, alpha, beta, True)[1]
+                new_score = self.ai_minimax(b_copy, depth - 1, alpha, beta, True)[1]
                 if new_score < value:
                     value = new_score
                     column = col
@@ -178,9 +176,9 @@ class Board:
                     break
             return column, value
 
-    def pick_best_move(self,board, piece):
+    def easy_ai(self, board, piece):
         valid_locations = self.get_valid_locations(board)
-        best_score = -10000
+        best_score = -100000
         best_col = random.choice(valid_locations)
         for col in valid_locations:
             row = self.get_free_row(board, col)
