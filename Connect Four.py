@@ -63,14 +63,15 @@ def buttons(xpos, ypos, width, hight, color, msg, size, level):
                 current_screen = "loading"
                 if level == 1:
                     ai_level = 1
-                elif level == 2:
+                if level == 2:
                     ai_level = 2
-                else:
+                if level == 3:
                     ai_level = 3
-
                 if level == 4:
                     game_over = False
                     game_start_again = True
+                if level == 5:
+                    game_over = False
 
 
 def main_menu():
@@ -287,14 +288,16 @@ while True:
         while game_over:
             font1 = pygame.font.SysFont("javanesetext", 30)
             end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black)
-            window_end_rect = end_Header.get_rect(center=(350, 300))
+            window_end_rect = end_Header.get_rect(center=(350, 150))
             win.blit(background_game_over, (0, 0))
             win.blit(end_Header, window_end_rect)
 
             label = font1.render(winner, True, Black)
-            win.blit(label, (250, 350))
+            win.blit(label, (250, 200))
 
-            buttons(WIDTH / 3, 500, 200, 100, Red, "Level : Hard", 30, 4)
+            # Play again button
+            buttons(WIDTH / 3 + 35, 300, 150, 80, Red, "Play Again", 20, 4)
+            buttons(WIDTH / 3 + 35, 400, 150, 80, Red, "Quit", 20, 5)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
