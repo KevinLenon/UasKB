@@ -23,7 +23,7 @@ def draw_board(board):
         for j in range(boards.row):
             screen.blit(beta, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
             # pygame.draw.rect(screen, Blue, (i * Board_Size, j * Board_Size + Board_Size, Board_Size, Board_Size))
-            pygame.draw.circle(screen, Background_color, (
+            pygame.draw.circle(screen, Salmon, (
                 int(i * Board_Size + Board_Size / 2), int(j * Board_Size + Board_Size + Board_Size / 2)), Radius)
 
     for i in range(boards.column):
@@ -98,8 +98,9 @@ Background_color = (255, 178, 102)
 Red = (255, 0, 0)
 Yellow = (255, 255, 0)
 Black = (0, 0, 0)
-Grey = (211, 211, 211)
+Salmon = (251, 160, 122)
 Green = (0, 255, 0)
+Grey = (211, 211, 211)
 
 # Menu Screen
 WIDTH = 700
