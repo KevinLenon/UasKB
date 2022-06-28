@@ -38,7 +38,7 @@ def draw_board(board):
 
 
 def buttons(xpos, ypos, width, hight, color, msg, size, level):
-    global win, current_screen, ai_level, game_status, player_status, level_check, game_over, game_start_again
+    global win, current_screen, ai_level, game_over, game_start_again
 
     pos = pygame.mouse.get_pos()
     fontb = pygame.font.SysFont("javanesetext", size)
@@ -229,7 +229,7 @@ while True:
                             # Checking player is win or not
                             if boards.win_condition(temp, boards.Player_Piece):
                                 play_BGM(3)
-                                winner = "Player 1 wins!!"
+                                winner = "Player is the winner!"
                                 player_status = True
 
                             # boards.print_board(temp)
@@ -261,7 +261,7 @@ while True:
 
                         if boards.win_condition(temp, boards.AI_Piece):
                             play_BGM(3)
-                            winner = "Player 2 wins!!"
+                            winner = "AI is the winner!"
                             player_status = True
 
                         # boards.print_board(temp)
@@ -272,7 +272,7 @@ while True:
                         turn = turn % 2
 
                         if count == 42:
-                            winner = "Draw"
+                            winner = "Draw!"
                             player_status = True
 
                 # Game end Status
@@ -286,14 +286,19 @@ while True:
     # Game over screen
     if game_over:
         while game_over:
-            font1 = pygame.font.SysFont("javanesetext", 30)
-            end_Header = font1.render("Game Over! Please Press ESC to quit ", True, Black)
+            font1 = pygame.font.SysFont("javanesetext", 25)
+            end_Header = font1.render("Game Over! Please Press Quit button to end the game", True, Black)
             window_end_rect = end_Header.get_rect(center=(350, 150))
             win.blit(background_game_over, (0, 0))
             win.blit(end_Header, window_end_rect)
 
             label = font1.render(winner, True, Black)
-            win.blit(label, (250, 200))
+            if winner == "AI is the winner!":
+                win.blit(label, (250, 200))
+            elif winner == "Player is the winner!":
+                win.blit(label, (220, 200))
+
+
 
             # Play again button
             buttons(WIDTH / 3 + 35, 300, 150, 80, Red, "Play Again", 20, 4)
